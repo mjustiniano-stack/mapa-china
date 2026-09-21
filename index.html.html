@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explorador de provincias de China</title>
+  <script src="https://assets.pyecharts.org/assets/v6/echarts.min.js"></script>
+  <script src="https://assets.pyecharts.org/assets/v6/maps/china.js"></script>
+  <style>
+    :root {
+      --bg1: #eff6ff;
+      --bg2: #dfeeff;
+      --panel: rgba(255,255,255,0.82);
+      --border: rgba(16, 71, 146, 0.14);
+      --title: #123b72;
+      --text: #213a57;
+      --muted: #60789a;
+      --blue1: #eaf4ff;
+      --blue2: #b7d8ff;
+      --blue3: #78aefc;
+      --blue4: #3d7af0;
+      --blue5: #1e5bc8;
+      --blue6: #113b7a;
+      --gold: #f4c96d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 40%, #f7fbff 100%);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1480px;
+      margin: 28px auto;
+      padding: 22px 24px 30px;
+      background: var(--panel);
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 36px rgba(20, 49, 93, 0.12);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .title-wrap {
+      text-align: left;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      color: var(--title);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .legend-badge {
+      background: linear-gradient(135deg, #eff7ff, #dfeeff);
+      border: 1px solid rgba(49, 95, 175, 0.2);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      color: var(--title);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .map-shell {
+      width: 100%;
+      height: 820px;
+      min-height: 680px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(18, 59, 114, 0.08);
+    }
+
+    #chinaMap {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="title-wrap">
+        <h1 class="title">Explorador de provincias de China</h1>
+        <div class="subtitle">Pasa el cursor sobre cada provincia para ver su información</div>
+      </div>
+      <div class="legend-badge">Nombres en español • datos provinciales</div>
+    </div>
+
+    <div class="map-shell">
+      <div id="chinaMap"></div>
+    </div>
+  </div>
+
+  <script>
+    var chart = echarts.init(document.getElementById('chinaMap'), 'white', { renderer: 'canvas', locale: 'EN' });
+
+    var provinceDetails = [
+      { name: '北京', label: 'Beijing', value: 120, area: '16,410.54 km²', population: '21.9 million', capital: 'Beijing' },
+      { name: '天津', label: 'Tianjin', value: 90, area: '11,916.7 km²', population: '13.9 million', capital: 'Tianjin' },
+      { name: '河北', label: 'Hebei', value: 140, area: '188,800 km²', population: '74.6 million', capital: 'Shijiazhuang' },
+      { name: '山西', label: 'Shanxi', value: 110, area: '156,700 km²', population: '34.5 million', capital: 'Taiyuan' },
+      { name: '内蒙古', label: 'Inner Mongolia', value: 80, area: '1,183,000 km²', population: '24.6 million', capital: 'Hohhot' },
+      { name: '辽宁', label: 'Liaoning', value: 130, area: '145,900 km²', population: '42.9 million', capital: 'Shenyang' },
+      { name: '吉林', label: 'Jilin', value: 100, area: '187,400 km²', population: '24.1 million', capital: 'Changchun' },
+      { name: '黑龙江', label: 'Heilongjiang', value: 120, area: '473,000 km²', population: '31.9 million', capital: 'Harbin' },
+      { name: '上海', label: 'Shanghai', value: 150, area: '6,340.5 km²', population: '24.9 million', capital: 'Shanghai' },
+      { name: '江苏', label: 'Jiangsu', value: 200, area: '102,600 km²', population: '84.8 million', capital: 'Nanjing' },
+      { name: '浙江', label: 'Zhejiang', value: 180, area: '101,800 km²', population: '64.4 million', capital: 'Hangzhou' },
+      { name: '安徽', label: 'Anhui', value: 130, area: '139,600 km²', population: '61.0 million', capital: 'Hefei' },
+      { name: '福建', label: 'Fujian', value: 120, area: '121,400 km²', population: '41.5 million', capital: 'Fuzhou' },
+      { name: '江西', label: 'Jiangxi', value: 110, area: '167,000 km²', population: '45.2 million', capital: 'Nanchang' },
+      { name: '山东', label: 'Shandong', value: 210, area: '157,900 km²', population: '101.5 million', capital: 'Jinan' },
+      { name: '河南', label: 'Henan', value: 170, area: '167,000 km²', population: '99.4 million', capital: 'Zhengzhou' },
+      { name: '湖北', label: 'Hubei', value: 160, area: '185,900 km²', population: '57.7 million', capital: 'Wuhan' },
+      { name: '湖南', label: 'Hunan', value: 150, area: '211,800 km²', population: '66.4 million', capital: 'Changsha' },
+      { name: '广东', label: 'Guangdong', value: 220, area: '179,800 km²', population: '126.0 million', capital: 'Guangzhou' },
+      { name: '广西', label: 'Guangxi', value: 95, area: '236,700 km²', population: '50.1 million', capital: 'Nanning' },
+      { name: '海南', label: 'Hainan', value: 70, area: '35,400 km²', population: '10.5 million', capital: 'Haikou' },
+      { name: '重庆', label: 'Chongqing', value: 90, area: '82,400 km²', population: '32.1 million', capital: 'Chongqing' },
+      { name: '四川', label: 'Sichuan', value: 170, area: '486,000 km²', population: '83.6 million', capital: 'Chengdu' },
+      { name: '贵州', label: 'Guizhou', value: 100, area: '176,200 km²', population: '38.6 million', capital: 'Guiyang' },
+      { name: '云南', label: 'Yunnan', value: 110, area: '394,000 km²', population: '47.2 million', capital: 'Kunming' },
+      { name: '西藏', label: 'Tibet', value: 50, area: '1,228,000 km²', population: '3.7 million', capital: 'Lhasa' },
+      { name: '陕西', label: 'Shaanxi', value: 120, area: '205,600 km²', population: '39.5 million', capital: 'Xi\'an' },
+      { name: '甘肃', label: 'Gansu', value: 80, area: '425,800 km²', population: '25.4 million', capital: 'Lanzhou' },
+      { name: '青海', label: 'Qinghai', value: 60, area: '720,000 km²', population: '6.0 million', capital: 'Xining' },
+      { name: '宁夏', label: 'Ningxia', value: 55, area: '66,400 km²', population: '7.5 million', capital: 'Yinchuan' },
+      { name: '新疆', label: 'Xinjiang', value: 90, area: '1,664,900 km²', population: '25.9 million', capital: 'Ürümqi' },
+      { name: '台湾', label: 'Taiwan', value: 100, area: '36,000 km²', population: '23.6 million', capital: 'Taipei' },
+      { name: '香港', label: 'Hong Kong', value: 65, area: '1,104 km²', population: '7.5 million', capital: 'Hong Kong' },
+      { name: '澳门', label: 'Macao', value: 30, area: '32.9 km²', population: '0.7 million', capital: 'Macao' }
+    ];
+
+    var nameMap = {
+      '北京市': 'Beijing', '北京': 'Beijing', '天津市': 'Tianjin', '天津': 'Tianjin',
+      '河北省': 'Hebei', '河北': 'Hebei', '山西省': 'Shanxi', '山西': 'Shanxi',
+      '内蒙古自治区': 'Inner Mongolia', '内蒙古': 'Inner Mongolia',
+      '辽宁省': 'Liaoning', '辽宁': 'Liaoning', '吉林省': 'Jilin', '吉林': 'Jilin',
+      '黑龙江省': 'Heilongjiang', '黑龙江': 'Heilongjiang', '上海市': 'Shanghai', '上海': 'Shanghai',
+      '江苏省': 'Jiangsu', '江苏': 'Jiangsu', '浙江省': 'Zhejiang', '浙江': 'Zhejiang',
+      '安徽省': 'Anhui', '安徽': 'Anhui', '福建省': 'Fujian', '福建': 'Fujian',
+      '江西省': 'Jiangxi', '江西': 'Jiangxi', '山东省': 'Shandong', '山东': 'Shandong',
+      '河南省': 'Henan', '河南': 'Henan', '湖北省': 'Hubei', '湖北': 'Hubei',
+      '湖南省': 'Hunan', '湖南': 'Hunan', '广东省': 'Guangdong', '广东': 'Guangdong',
+      '广西壮族自治区': 'Guangxi', '广西': 'Guangxi', '海南省': 'Hainan', '海南': 'Hainan',
+      '重庆市': 'Chongqing', '重庆': 'Chongqing', '四川省': 'Sichuan', '四川': 'Sichuan',
+      '贵州省': 'Guizhou', '贵州': 'Guizhou', '云南省': 'Yunnan', '云南': 'Yunnan',
+      '西藏自治区': 'Tibet', '西藏': 'Tibet', '陕西省': 'Shaanxi', '陕西': 'Shaanxi',
+      '甘肃省': 'Gansu', '甘肃': 'Gansu', '青海省': 'Qinghai', '青海': 'Qinghai',
+      '宁夏回族自治区': 'Ningxia', '宁夏': 'Ningxia', '新疆维吾尔自治区': 'Xinjiang', '新疆': 'Xinjiang',
+      '台湾省': 'Taiwan', '台湾': 'Taiwan', '香港特别行政区': 'Hong Kong', '香港': 'Hong Kong',
+      '澳门特别行政区': 'Macao', '澳门': 'Macao'
+    };
+
+    function cleanProvinceName(rawName) {
+      return String(rawName || '')
+        .replace(/(壮族自治区|回族自治区|维吾尔自治区|特别行政区|自治区|省|市)$/g, '')
+        .trim();
+    }
+
+    function findProvinceInfo(rawName) {
+      var cleanName = cleanProvinceName(rawName);
+      return provinceDetails.find(function (item) {
+        return item.name === rawName
+          || item.label === rawName
+          || item.name === cleanName
+          || item.label === nameMap[rawName];
+      }) || null;
+    }
+
+    var mapData = provinceDetails.map(function (item) {
+      return {
+        name: item.name,
+        value: item.value,
+        label: item.label,
+        area: item.area,
+        population: item.population,
+        capital: item.capital
+      };
+    });
+
+    var option = {
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(15, 39, 71, 0.92)',
+        borderWidth: 0,
+        padding: 12,
+        textStyle: { color: '#ffffff', fontSize: 12 },
+        formatter: function (params) {
+          var rawName = params.name || (params.data && params.data.name) || '';
+          var info = findProvinceInfo(rawName) || {};
+          var provinceName = info.label || nameMap[rawName] || rawName || 'Provincia';
+          var area = info.area || '-';
+          var population = info.population || '-';
+          var capital = info.capital || '-';
+
+          return [
+            '<div style="min-width:220px;">',
+            '  <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:#fff;">' + provinceName + '</div>',
+            '  <div style="line-height:1.7; color:#eaf3ff;">',
+            '    <div><b>Superficie:</b> ' + area + '</div>',
+            '    <div><b>Población:</b> ' + population + '</div>',
+            '    <div><b>Ciudad principal:</b> ' + capital + '</div>',
+            '  </div>',
+            '</div>'
+          ].join('');
+        }
+      },
+      visualMap: {
+        type: 'continuous',
+        min: 0,
+        max: 220,
+        orient: 'vertical',
+        left: 'right',
+        top: 'middle',
+        text: ['High', 'Low'],
+        calculable: true,
+        inRange: {
+          color: ['#eaf4ff', '#b7d8ff', '#78aefc', '#3d7af0', '#1e5bc8', '#113b7a']
+        },
+        textStyle: { color: '#123b72', fontSize: 12 }
+      },
+      series: [{
+        type: 'map',
+        map: 'china',
+        nameMap: nameMap,
+        roam: true,
+        aspectScale: 0.9,
+        label: {
+          show: true,
+          fontSize: 10,
+          color: '#102d4d'
+        },
+        data: mapData,
+        emphasis: {
+          label: {
+            show: true,
+            fontWeight: 'bold',
+            color: '#0a1d34'
+          },
+          itemStyle: {
+            areaColor: '#ffd166',
+            shadowBlur: 8,
+            shadowColor: 'rgba(0,0,0,0.18)'
+          }
+        }
+      }]
+    };
+
+    chart.setOption(option);
+    window.addEventListener('resize', function () { chart.resize(); });
+  </script>
+</body>
+</html>
